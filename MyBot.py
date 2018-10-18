@@ -10,9 +10,6 @@ from hlt import constants
 # This library contains direction metadata to better interface with the game.
 from hlt.positionals import Direction
 
-# This library allows you to generate random numbers.
-import random
-
 # Logging allows you to save messages for yourself. This is required because the regular STDOUT
 #   (print statements) are reserved for the engine-bot communication.
 import logging
@@ -47,10 +44,17 @@ while True:
     for ship in me.get_ships():
         # For each of your ships, move randomly if the ship is on a low halite location or the ship is full.
         #   Else, collect halite.
-        if game_map[ship.position].halite_amount < constants.MAX_HALITE / 10 or ship.is_full:
-            command_queue.append(
-                ship.move(
-                    random.choice([ Direction.North, Direction.South, Direction.East, Direction.West ])))
+		directionAmounts = {game_map[ship.position.directional_offset(dir)].halite_amount : dir for dir in [Direction.Still, Direction.North, Direction.South, Direction.East, Direction.West]}
+																										   
+		bestDirection = directionAmounts[max(directionAmounts)]
+		
+		if not ship.is_full:
+			command_queue.append(ship.move(bestDirection))
+		else:
+			
+		
+        if game_map[ship.position].halite_amount < constants.MAX_HALITE / 25 or ship.is_full:
+            command_queue.append(ship.move(random.choice([ Direction.North, Direction.South, Direction.East, Direction.West ])))
         else:
             command_queue.append(ship.stay_still())
 
